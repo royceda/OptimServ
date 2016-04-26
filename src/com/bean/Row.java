@@ -2,6 +2,8 @@ package com.bean;
 
 import java.util.Arrays;
 
+import com.parser.Parser;
+
 public class Row {
 	private int id;
 	private int size;
@@ -10,8 +12,9 @@ public class Row {
 	public Row(){}
 	
 	
+	
 	public Row(int id, int size){
-		this.id = id;
+		this.setId(id);
 		this.size = size;
 		slots = new boolean[size];
 		Arrays.fill(slots, true);
@@ -37,6 +40,18 @@ public class Row {
 	}
 	public void setSlots(boolean slots[]) {
 		this.slots = slots;
+	}
+
+
+
+	public int getId() {
+		return id;
+	}
+
+
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	

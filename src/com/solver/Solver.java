@@ -1,6 +1,13 @@
 package com.solver;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import com.bean.Row;
+import com.bean.Server;
+import com.parser.Parser;
 
 import ilog.concert.IloColumnArray;
 import ilog.concert.IloException;
@@ -19,19 +26,70 @@ public class Solver{
 
 	private double bin[]; //size of bins
 	private double item[]; //size of items
+	private double power[]; //power of item
 
 	//private int x[][]; 
 	//private int y[][];
 
 
 	public Solver(){}
+	
+	/**
+	 * Transform into bin-packing variables
+	 * @param servers
+	 * @param rows
+	 */
+	public Solver(Parser parse){
+		
+		ArrayList<Server> servers = parse.getServers();
+		HashMap<Integer, Row> rows = parse.getRows();
+		
+		n = servers.size();
+		
+		item = new double[servers.size()];
+		power = new double[servers.size()];
+		int k = 0;
+		for(Iterator<Server> ite = servers.iterator(); ite.hasNext(); ){
+			Server tmp = ite.next();
+			item[k] = tmp.getSize();
+			power[k] = tmp.getCapacity();
+			k++;
+		}
+		
+		k = 0;
+		for(Iterator<Integer> ite = rows.keySet().iterator(); ite.hasNext();){
+			int tmp = ite.next();
+			Row current = rows.get(tmp);
+			
+			ArrayList<Integer> buffer = new ArrayList<Integer>();
+			
+			//creation of bins
+			int j = 0;
+			for(int i = 0; i<current.getSize(); i++){
+				if(current.getSlots()[i]){
+					buffer.add(i-j+1);
+					j = i;
+					k++;
+				}
+			}
+			
+			m = buffer.size();
+			bin = new double[buffer.size()];
+			int i = 0;
+			for(int a : buffer){
+				bin[i] = a;
+				i++;
+			}			
+		}
+	}
 
+	
 	public void solve(){
 		try {
 			IloCplex cplex = new IloCplex();
 			
-			IloNumVar[][] varX = new IloNumVar[1][];
-			IloNumVar[][] varY = new IloNumVar[1][];
+			IloNumVar[][] varX = new IloNumVar[n][];
+			IloNumVar[][] varY = new IloNumVar[m][];
 			IloRange[][]  rng = new IloRange[3][]; //3 constraints group
 			
 			populateByRow(cplex, varX, varY, rng);
@@ -96,7 +154,7 @@ public class Solver{
 
 		// Objective Function:  maximize 5*x0 + 75*x1 + 25*x2 
 		//double[] objvals = {5.0, 75.0, 25.0};
-		model.addMaximize(model.scalProd(xub, x[0])); // à bien faire ( bcp de max et min)
+		model.addMinimize(model.scalProd(xub, x[0])); // à bien faire ( bcp de max et min)
 
 
 		// (KP) constraint

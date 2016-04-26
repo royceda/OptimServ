@@ -20,6 +20,7 @@ public class Parser {
 	private int S;
 	private int us;
 	private int p;
+	
 	private ArrayList<Server> servers;
 	private HashMap<Integer, Row> rows;
 	
@@ -41,9 +42,10 @@ public class Parser {
 			R  = Integer.parseInt(var[0]);
 			S  = Integer.parseInt(var[1]);
 			us = Integer.parseInt(var[2]);
-			p  = Integer.parseInt(var[3]);
+			setP(Integer.parseInt(var[3]));
 			n  = Integer.parseInt(var[4]);
 		}
+		
 		
 		//init rows
 		for(int i = 0; i<R; i++){
@@ -56,7 +58,8 @@ public class Parser {
 		for(int i=0; i<us; i++){
 			if((line = br.readLine()) != null){
 				String var[] = line.split(" ");
-				rows.get(Integer.parseInt(var[0])).setUnavailable(Integer.parseInt(var[1]));
+				rows.get(Integer.parseInt(var[0]))
+				.setUnavailable(Integer.parseInt(var[1]));
 			}
 		}
 		
@@ -69,5 +72,32 @@ public class Parser {
 				servers.add(tmp);
 			}
 		}
+	}
+
+
+	public int getP() {
+		return p;
+	}
+
+
+	public void setP(int p) {
+		this.p = p;
+	}
+	
+	public int getR() {
+		return R;
+	}
+
+
+	public void setR(int r) {
+		this.R = r;
+	}
+	
+	public ArrayList<Server> getServers(){
+		return servers;
+	}
+	
+	public HashMap<Integer, Row> getRows(){
+		return rows;
 	}
 }
